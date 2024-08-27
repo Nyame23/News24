@@ -12,6 +12,7 @@ interface NewsArticle {
   description: string;
   url: string;
   urlToImage: string; 
+  publishedAt: string; // Add this field to represent the publication date
 }
 
 const News: React.FC = () => {
@@ -23,12 +24,19 @@ const News: React.FC = () => {
 
   useEffect(() => {
     fetchNews(selectedCategory);
+    
+    // Set up an interval to fetch news every hour (3600000 milliseconds)
+    const intervalId = setInterval(() => {
+      fetchNews(selectedCategory);
+    }, 3600000);
+
+    // Cleanup the interval when the component unmounts or category changes
+    return () => clearInterval(intervalId);
   }, [selectedCategory]);
 
   const fetchNews = async (category: string): Promise<void> => {
     setLoading(true);
 
-    // Define keywords for each category
     const categoryKeywords: { [key: string]: string } = {
       General: 'news',
       Sports: 'sports OR football OR basketball',
@@ -40,13 +48,19 @@ const News: React.FC = () => {
     try {
       const response = await axios.get(`https://newsapi.org/v2/everything`, {
         params: {
-          q: categoryKeywords[category], // Use the appropriate keyword for the category
+          q: categoryKeywords[category],
           apiKey: API_KEY,
           language: 'en', 
           sortBy: 'relevance',
         },
       });
-      setNewsData(response.data.articles);
+      
+      // Sort the articles by published date in descending order (latest first)
+      const sortedArticles = response.data.articles.sort(
+        (a: NewsArticle, b: NewsArticle) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      );
+      
+      setNewsData(sortedArticles);
     } catch (error) {
       console.error('Error fetching news data:', error);
     } finally {

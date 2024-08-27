@@ -42,7 +42,7 @@ const Welcome = () => {
           </Text>
           
           <CustomButton
-            title="Continue with Email"
+            title="WELCOME"
             onPress={() => router.push("/home")}
             containerStyles={styles.button}
           />

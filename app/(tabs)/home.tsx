@@ -28,17 +28,17 @@ interface LatestNewsItemProps {
 const { width: screenWidth } = Dimensions.get('window');
 
 const newsCategories: NewsCategory[] = [
-    { id: '1', title: 'General News', image: require('../../assets/images1/cards.png') },
-    { id: '2', title: 'Sports', image: images.c1 },
-    { id: '3', title: 'Technology', image: images.c3 },
-    { id: '4', title: 'Entertainment', image: images.c4 },
+    { id: '1', title: 'General News', image: images.gen },
+    { id: '2', title: 'Sports', image: images.sport },
+    { id: '3', title: 'Technology', image: images.tech1 },
+    { id: '4', title: 'Entertainment', image: images.ent },
 ];
 
 const latestNews: LatestNewsItem[] = [
-    { id: '1', title: 'Breaking News: Major Event Happening Now', image: images.monalisa },
-    { id: '2', title: 'Sports Update: Game Results', image: images.c4 },
-    { id: '3', title: 'Tech Review: New Gadget Released', image: images.c2 },
-    { id: '4', title: 'Entertainment: Celebrity News', image: images.c1 },
+    { id: '1', title: 'Breaking News: Major Event Happening Now', image: images.unv },
+    { id: '2', title: 'Sports Update: Game Results', image: images.unv },
+    { id: '3', title: 'Tech Review: New Gadget Released', image: images.unv },
+    { id: '4', title: 'Entertainment: Celebrity News', image: images.unv },
 ];
 
 const CategoryCard = memo(({ item, colorScheme }: CategoryCardProps) => (
@@ -54,7 +54,12 @@ const CategoryCard = memo(({ item, colorScheme }: CategoryCardProps) => (
 
 const LatestNewsItem = memo(({ item, colorScheme }: LatestNewsItemProps) => (
     <View style={styles.newsItem}>
-        <ImageBackground source={item.image} style={styles.newsImage} imageStyle={styles.imageStyle}>
+        <ImageBackground 
+            source={item.image} 
+            style={styles.newsImage} 
+            imageStyle={styles.imageStyle} 
+            resizeMode="cover" // Ensure the image covers the entire card
+        >
             <View style={styles.overlay}>
                 <Text style={[styles.newsTitle, { color: colorScheme === 'dark' ? '#fff' : '#fff' }]}>{item.title}</Text>
             </View>
@@ -183,6 +188,8 @@ const styles = StyleSheet.create({
     },
     newsImage: {
         flex: 1,
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -208,5 +215,4 @@ const styles = StyleSheet.create({
         color: '#FFD700',
     },
 });
-
 export default HomePage;
