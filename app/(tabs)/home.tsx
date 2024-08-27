@@ -1,6 +1,7 @@
 import React, { useCallback, memo } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, useColorScheme, ImageBackground, Image, ImageSourcePropType, ColorSchemeName } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground, Image, ImageSourcePropType, Dimensions } from 'react-native';
 import { images } from '../../constants';
+import { useTheme } from '../context/ThemeContext';
 
 interface NewsCategory {
     id: string;
@@ -16,13 +17,15 @@ interface LatestNewsItem {
 
 interface CategoryCardProps {
     item: NewsCategory;
-    colorScheme: ColorSchemeName;
+    colorScheme: 'light' | 'dark';
 }
 
 interface LatestNewsItemProps {
     item: LatestNewsItem;
-    colorScheme: ColorSchemeName;
+    colorScheme: 'light' | 'dark';
 }
+
+const { width: screenWidth } = Dimensions.get('window');
 
 const newsCategories: NewsCategory[] = [
     { id: '1', title: 'General News', image: require('../../assets/images1/cards.png') },
@@ -39,13 +42,13 @@ const latestNews: LatestNewsItem[] = [
 ];
 
 const CategoryCard = memo(({ item, colorScheme }: CategoryCardProps) => (
-    <TouchableOpacity style={styles.card}>             
-        <View style={styles.imageContainer}>           
-            <Image source={item.image} style={styles.absoluteImage} />         
+    <TouchableOpacity style={styles.card}>
+        <View style={styles.imageContainer}>
+            <Image source={item.image} style={styles.absoluteImage} />
             <View style={styles.overlay}>
                 <Text style={[styles.cardTitle, { color: colorScheme === 'dark' ? '#fff' : '#fff' }]}>{item.title}</Text>
-            </View>          
-        </View>           
+            </View>
+        </View>
     </TouchableOpacity>
 ));
 
@@ -54,13 +57,14 @@ const LatestNewsItem = memo(({ item, colorScheme }: LatestNewsItemProps) => (
         <ImageBackground source={item.image} style={styles.newsImage} imageStyle={styles.imageStyle}>
             <View style={styles.overlay}>
                 <Text style={[styles.newsTitle, { color: colorScheme === 'dark' ? '#fff' : '#fff' }]}>{item.title}</Text>
-            </View>  
+            </View>
         </ImageBackground>
     </View>
 ));
 
 const HomePage = () => {
-    const colorScheme = useColorScheme() || 'light'; // Provide default value
+    const { darkMode } = useTheme();
+    const colorScheme = darkMode ? 'dark' : 'light';
 
     const renderCategory = useCallback(({ item }: { item: NewsCategory }) => (
         <CategoryCard item={item} colorScheme={colorScheme} />
@@ -93,9 +97,6 @@ const HomePage = () => {
                                     horizontal
                                     showsHorizontalScrollIndicator={false}
                                     contentContainerStyle={styles.categoryList}
-                                    initialNumToRender={5}
-                                    maxToRenderPerBatch={10}
-                                    windowSize={21}
                                 />
                             </View>
                         );
@@ -110,9 +111,6 @@ const HomePage = () => {
                                     horizontal
                                     showsHorizontalScrollIndicator={false}
                                     contentContainerStyle={styles.newsList}
-                                    initialNumToRender={5}
-                                    maxToRenderPerBatch={10}
-                                    windowSize={21}
                                 />
                             </View>
                         );
@@ -130,23 +128,22 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        paddingTop: 15, // Adjusted for header space
+        paddingTop: 30,
     },
     channelHeader: {
-        marginBottom: 24, // Existing margin to push content down
-        marginTop: 16, // Adjust this value to move header down
-        marginLeft: 16,
-        left: -140, // Adjust this value to move header to the left
+        marginBottom: 16,
+        alignItems: 'center',
+        marginLeft: -250,
     },
     sectionTitle: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 'bold',
-        marginVertical: 16,
+        marginVertical: 12,
     },
     card: {
         borderRadius: 8,
-        width: 150,
-        height: 190,
+        width: screenWidth * 0.4,
+        height: screenWidth * 0.5,
         marginHorizontal: 8,
         overflow: 'hidden',
     },
@@ -167,10 +164,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     cardTitle: {
-        fontSize: 17,
+        fontSize: 16,
         fontWeight: 'bold',
         padding: 8,
-        borderRadius: 4,
+        textAlign: 'center',
     },
     imageStyle: {
         borderRadius: 8,
@@ -178,8 +175,8 @@ const styles = StyleSheet.create({
     newsItem: {
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         borderRadius: 8,
-        width: 150,
-        height: 190,
+        width: screenWidth * 0.4,
+        height: screenWidth * 0.5,
         marginHorizontal: 8,
         marginBottom: 8,
         overflow: 'hidden',
@@ -190,26 +187,26 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     newsTitle: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: 'bold',
         padding: 8,
-        borderRadius: 4,
+        textAlign: 'center',
     },
     categoryList: {
         marginBottom: 16,
+        paddingHorizontal: 8,
     },
     newsList: {
         paddingBottom: 16,
+        paddingHorizontal: 8,
     },
     title: {
         fontSize: 28,
-        textAlign: 'center',
         fontWeight: 'bold',
     },
     highlight: {
         color: '#FFD700',
     },
 });
-
 
 export default HomePage;

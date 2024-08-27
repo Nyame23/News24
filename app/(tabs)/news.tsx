@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image, useColorScheme, SafeAreaView } from 'react-native';
 import axios from 'axios';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
 
 const API_KEY = 'f7e9b7f9814442818c4163a2891df713'; // Replace with your NewsAPI key
 const CATEGORIES: string[] = ['General', 'Sports', 'Entertainment', 'Business', 'Technology'];
@@ -10,14 +11,15 @@ interface NewsArticle {
   title: string;
   description: string;
   url: string;
-  urlToImage: string; // Add image URL field
+  urlToImage: string; 
 }
 
 const News: React.FC = () => {
   const [newsData, setNewsData] = useState<NewsArticle[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('general');
+  const [selectedCategory, setSelectedCategory] = useState<string>('General');
   const [loading, setLoading] = useState<boolean>(true);
-  const colorScheme = useColorScheme();
+  const { darkMode } = useTheme();
+  const colorScheme = darkMode ? 'dark' : 'light';
 
   useEffect(() => {
     fetchNews(selectedCategory);
@@ -25,12 +27,23 @@ const News: React.FC = () => {
 
   const fetchNews = async (category: string): Promise<void> => {
     setLoading(true);
+
+    // Define keywords for each category
+    const categoryKeywords: { [key: string]: string } = {
+      General: 'news',
+      Sports: 'sports OR football OR basketball',
+      Entertainment: 'entertainment OR movies OR celebrities',
+      Business: 'business OR economy OR finance',
+      Technology: 'technology OR gadgets OR AI',
+    };
+
     try {
-      const response = await axios.get(`https://newsapi.org/v2/top-headlines`, {
+      const response = await axios.get(`https://newsapi.org/v2/everything`, {
         params: {
-          category,
+          q: categoryKeywords[category], // Use the appropriate keyword for the category
           apiKey: API_KEY,
-          country: 'us', // Adjust the country as needed
+          language: 'en', 
+          sortBy: 'relevance',
         },
       });
       setNewsData(response.data.articles);
@@ -42,7 +55,7 @@ const News: React.FC = () => {
   };
 
   const renderCategory = ({ item }: { item: string }) => {
-    const isSelected = item.toLowerCase() === selectedCategory.toLowerCase();
+    const isSelected = item === selectedCategory;
     
     return (
       <TouchableOpacity
@@ -122,7 +135,7 @@ const News: React.FC = () => {
           <FlatList
             data={newsData}
             renderItem={renderNewsItem}
-            keyExtractor={(item) => item.url}
+            keyExtractor={(item, index) => `${item.url}-${index}`} 
             contentContainerStyle={styles.newsList}
           />
         )}
@@ -135,23 +148,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 60, // Added padding to ensure header doesn't overlap with content
+    paddingTop: 60, 
   },
   channelHeader: {
     position: 'absolute',
     top: 32,
     left: 16,
-    zIndex: 1, // Ensure it stays above other content
+    zIndex: 1, 
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
   },
   highlight: {
-    color: '#FFD700', // Adjust highlight color
+    color: '#FFD700', 
   },
   categoryContainer: {
-    marginTop: 6, // Space for header
+    marginTop: 6, 
     paddingVertical: 20,
   },
   categoryList: {

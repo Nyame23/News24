@@ -1,17 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, useColorScheme } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, useWindowDimensions } from 'react-native';
 import YoutubeIframe from 'react-native-youtube-iframe';
+import { useTheme } from '../context/ThemeContext'; // Adjust the import path as needed
 
-const { width } = Dimensions.get('window');
-
-// Calculate responsive height based on the aspect ratio and screen width
 const calculateVideoHeight = (screenWidth: number): number => (screenWidth * 9) / 16;
 
 const Live = () => {
-  const colorScheme = useColorScheme();
-  
+  const { darkMode } = useTheme();
+  const { width } = useWindowDimensions();
+
   // Adjust video dimensions based on screen width
-  const videoWidth = width > 1024 ? width * 0.7 : width - 20; // 70% of screen width for larger screens
+  const videoWidth = width > 1024 ? width * 0.7 : width - 20;
   const videoHeight = calculateVideoHeight(videoWidth);
 
   // Define breakpoints
@@ -20,64 +19,66 @@ const Live = () => {
   const isSmallScreen = width <= 768;
 
   return (
-    <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? '#000' : '#fff' }]}>
-      
-      {/* Channel Header */}
-      <View style={[
-        styles.channelHeader, 
-        { top: isLargeScreen ? 60 : isMediumScreen ? 50 : 40 } // Adjust header position based on screen size
-      ]}>
-        <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-          News
-          <Text style={styles.highlight}> 24</Text>
-        </Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: darkMode ? '#000' : '#fff' }]}>
+      <View style={[styles.container, { backgroundColor: darkMode ? '#000' : '#fff' }]}>
+        
+        {/* Channel Header */}
+        <View style={[
+          styles.channelHeader, 
+          { top: isLargeScreen ? 60 : isMediumScreen ? 50 : 40 } // Adjust header position based on screen size
+        ]}>
+          <Text style={[styles.title, { color: darkMode ? '#fff' : '#000' }]}>
+            News
+            <Text style={styles.highlight}> 24</Text>
+          </Text>
+        </View>
+        
+        {/* Scrollable Content */}
+        <ScrollView contentContainerStyle={[
+          styles.contentContainer, 
+          { paddingTop: isLargeScreen ? 110 : isMediumScreen ? 100 : 0 } // Adjust paddingTop based on screen size
+        ]}>
+          {/* Live News Section */}
+          <View style={[styles.section, { alignItems: 'center' }]}>
+            <Text style={[styles.sectionTitle, { color: darkMode ? '#fff' : '#000' }]}>Live News</Text>
+            <View style={[styles.videoContainer, { width: videoWidth }]}>
+              <YoutubeIframe
+                height={videoHeight}
+                width={videoWidth}
+                videoId="YQHsXMglC9A" // Your video ID
+                play={true}
+              />
+            </View>
+          </View>
+
+          {/* Previous Podcasts Section */}
+          <View style={[styles.section, { alignItems: 'center' }]}>
+            <Text style={[styles.sectionTitle, { color: darkMode ? '#fff' : '#000' }]}>Podcasts</Text>
+            <View style={[styles.videoContainer, { width: videoWidth }]}>
+              <YoutubeIframe
+                height={videoHeight}
+                width={videoWidth}
+                videoId="YQHsXMglC9A" // Replace with another video ID
+                play={true}
+              />
+            </View>
+          </View>
+
+          {/* Additional Section */}
+          <View style={[styles.section, { alignItems: 'center' }]}>
+            <Text style={[styles.sectionTitle, { color: darkMode ? '#fff' : '#000' }]}>Ads</Text>
+            <View style={[styles.videoContainer, { width: videoWidth }]}>
+              <YoutubeIframe
+                height={videoHeight}
+                width={videoWidth}
+                videoId="YQHsXMglC9A" // Replace with another video ID
+                play={true}
+              />
+            </View>
+          </View>
+        </ScrollView>
       </View>
-      
-      {/* Scrollable Content */}
-      <ScrollView contentContainerStyle={[
-        styles.contentContainer, 
-        { paddingTop: isLargeScreen ? 110 : isMediumScreen ? 100 : 0 } // Adjust paddingTop based on screen size
-      ]}>
-        {/* Live News Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>Live News</Text>
-          <View style={[styles.videoContainer, { width: videoWidth }]}>
-            <YoutubeIframe
-              height={videoHeight}
-              width={videoWidth}
-              videoId="YQHsXMglC9A" // Your video ID
-              play={true}
-            />
-          </View>
-        </View>
-
-        {/* Previous Podcasts Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>Podcasts</Text>
-          <View style={[styles.videoContainer, { width: videoWidth }]}>
-            <YoutubeIframe
-              height={videoHeight}
-              width={videoWidth}
-              videoId="YQHsXMglC9A" // Replace with another video ID
-              play={true}
-            />
-          </View>
-        </View>
-
-        {/* Additional Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>Ads</Text>
-          <View style={[styles.videoContainer, { width: videoWidth }]}>
-            <YoutubeIframe
-              height={videoHeight}
-              width={videoWidth}
-              videoId="YQHsXMglC9A" // Replace with another video ID
-              play={true}
-            />
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -86,18 +87,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    alignItems: 'center', // Center content horizontally
+    alignItems: 'center',
     paddingBottom: 20,
   },
   channelHeader: {
-    marginBottom: 38, // Existing margin to push content down
-    marginTop: -8, // Adjust this value to move header down
+    marginBottom: 38,
+    marginTop: -2,
     marginLeft: 16,
-    left: -140, // Align to the left similar to HomePage
+    left: 0, // Align title to the left
+     // Use absolute positioning to adjust header position
+    width: '100%', // Ensure header spans the full width
   },
   title: {
     fontSize: 28,
-    textAlign: 'center',
+    textAlign: 'left', // Align text to the left
     fontWeight: 'bold',
   },
   highlight: {
@@ -105,7 +108,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginVertical: 20,
-    width: '100%', // Ensure section takes full width
+    width: '100%',
   },
   sectionTitle: {
     fontSize: 20,
@@ -113,7 +116,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   videoContainer: {
-    alignItems: 'center', // Center video horizontally
+    alignSelf: 'center', // Center video container horizontally
     marginBottom: 10,
   },
 });

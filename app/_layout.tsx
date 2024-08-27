@@ -1,15 +1,12 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import React, { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-import { useColorScheme } from 'react-native'; // Import from 'react-native'
+import { Stack } from 'expo-router';
+import { ThemeProvider } from './context/ThemeContext'; // Import ThemeProvider
+import { useFonts } from 'expo-font';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme(); // Get the device's color scheme
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -24,10 +21,8 @@ export default function RootLayout() {
     return null;
   }
 
-  const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
-
   return (
-    <ThemeProvider value={theme}>
+    <ThemeProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

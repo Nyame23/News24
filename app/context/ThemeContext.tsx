@@ -1,55 +1,77 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 
-// Define the context shape
-interface ThemeContextType {
+interface ThemeContextProps {
   darkMode: boolean;
-  toggleDarkMode: () => void;
   useDeviceTheme: boolean;
+  toggleDarkMode: () => void;
   toggleUseDeviceTheme: () => void;
+  fontSize: number;
+  setFontSize: (size: number) => void;
+  language: string;
+  setLanguage: (lang: string) => void;
+  notifications: boolean;
+  toggleNotifications: () => void;
 }
 
-// Create context with default values
-const ThemeContext = createContext<ThemeContextType>({
+const ThemeContext = createContext<ThemeContextProps>({
   darkMode: false,
-  toggleDarkMode: () => {},
   useDeviceTheme: true,
+  toggleDarkMode: () => {},
   toggleUseDeviceTheme: () => {},
+  fontSize: 16,
+  setFontSize: () => {},
+  language: 'en',
+  setLanguage: () => {},
+  notifications: true,
+  toggleNotifications: () => {},
 });
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const deviceColorScheme = useColorScheme();
-  const [darkMode, setDarkMode] = useState(deviceColorScheme === 'dark');
-  const [useDeviceTheme, setUseDeviceTheme] = useState(true);
+export const useTheme = () => useContext(ThemeContext);
 
-  // Update darkMode when deviceColorScheme or useDeviceTheme changes
-  useEffect(() => {
-    if (useDeviceTheme) {
-      setDarkMode(deviceColorScheme === 'dark');
-    }
-  }, [deviceColorScheme, useDeviceTheme]);
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  const deviceColorScheme = useColorScheme();
+  const [darkMode, setDarkMode] = useState<boolean>(deviceColorScheme === 'dark');
+  const [useDeviceTheme, setUseDeviceTheme] = useState<boolean>(true);
+  const [fontSize, setFontSize] = useState<number>(16);
+  const [language, setLanguage] = useState<string>('en');
+  const [notifications, setNotifications] = useState<boolean>(true);
 
   const toggleDarkMode = () => {
-    if (!useDeviceTheme) {
-      setDarkMode(prev => !prev);
-    }
+    setDarkMode(prevMode => !prevMode);
+    setUseDeviceTheme(false);
   };
 
   const toggleUseDeviceTheme = () => {
-    setUseDeviceTheme(prev => {
-      const newUseDeviceTheme = !prev;
-      if (newUseDeviceTheme) {
-        setDarkMode(deviceColorScheme === 'dark');
-      }
-      return newUseDeviceTheme;
-    });
+    setUseDeviceTheme(prevValue => !prevValue);
+    setDarkMode(deviceColorScheme === 'dark');
   };
 
+  const toggleNotifications = () => {
+    setNotifications(prevValue => !prevValue);
+  };
+
+  const theme = useDeviceTheme ? (deviceColorScheme === 'dark' ? DarkTheme : DefaultTheme) : (darkMode ? DarkTheme : DefaultTheme);
+
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode, useDeviceTheme, toggleUseDeviceTheme }}>
-      {children}
+    <ThemeContext.Provider
+      value={{
+        darkMode,
+        useDeviceTheme,
+        toggleDarkMode,
+        toggleUseDeviceTheme,
+        fontSize,
+        setFontSize,
+        language,
+        setLanguage,
+        notifications,
+        toggleNotifications,
+      }}
+    >
+      <NavigationThemeProvider value={theme}>
+        {children}
+      </NavigationThemeProvider>
     </ThemeContext.Provider>
   );
 };
-
-export const useTheme = () => useContext(ThemeContext);

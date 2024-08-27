@@ -3,15 +3,16 @@ import React from 'react';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons'; // Import icon libraries
 
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useTheme } from '../context/ThemeContext';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { darkMode } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: darkMode ? '#FFD700' : '#FFD700',
+        tabBarStyle: { backgroundColor: darkMode ? '#000' : '#fff' },
         headerShown: false,
       }}>
       <Tabs.Screen
