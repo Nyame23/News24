@@ -17,18 +17,13 @@ const Welcome = () => {
             News
             <Text style={styles.highlight}> 24</Text>
           </Text>
+
           <Image
-            //  source={images.logo} // Adjust image path if necessary
-            style={styles.logo}
+            source={images.globe1} // Adjust image path if necessary
+            style={styles.image}
             resizeMode="contain"
           />
-          
-          <Image
-            source={images.c4}
-            style={styles.cards}
-            resizeMode="contain"
-          />
-          
+
           <View style={styles.textContainer}>
             <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
               Discover Latest{'\n'}
@@ -42,7 +37,7 @@ const Welcome = () => {
           </Text>
           
           <CustomButton
-            title="Continue with Email"
+            title="WELCOME"
             onPress={() => router.push("/home")}
             containerStyles={styles.button}
           />
@@ -67,21 +62,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
-  logo: {
-    width: 130,
-    height: 84,
-  },
-  cards: {
-    maxWidth: 380,
-    width: '100%',
-    height: 298,
+  image: {
+    width: 250,
+    height: 250, 
+    marginVertical: 65, 
   },
   textContainer: {
     marginTop: -2,
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     textAlign: 'center',
     fontWeight: 'bold',
   },

@@ -1,14 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Switch, SafeAreaView, StatusBar, Button, Alert, Platform } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 
 const Settings = () => {
   const { darkMode, useDeviceTheme, toggleDarkMode, toggleUseDeviceTheme } = useTheme();
-  const [fontSize, setFontSize] = useState<number>(16); // Default font size
-  const [notifications, setNotifications] = useState<boolean>(true); // Default notification preference
-  const [language, setLanguage] = useState<string>('en'); // Default language
+  const [fontSize, setFontSize] = useState<number>(16);
+  const [notifications, setNotifications] = useState<boolean>(true);
+  const [language, setLanguage] = useState<string>('en');
+
+  useEffect(() => {
+    // Load settings from AsyncStorage when the component mounts
+    const loadSettings = async () => {
+      try {
+        const savedFontSize = await AsyncStorage.getItem('fontSize');
+        const savedNotifications = await AsyncStorage.getItem('notifications');
+        const savedLanguage = await AsyncStorage.getItem('language');
+
+        if (savedFontSize) setFontSize(parseFloat(savedFontSize));
+        if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
+        if (savedLanguage) setLanguage(savedLanguage);
+      } catch (error) {
+        console.error('Failed to load settings', error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
+    // Save settings to AsyncStorage whenever they change
+    const saveSettings = async () => {
+      try {
+        await AsyncStorage.setItem('fontSize', fontSize.toString());
+        await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+        await AsyncStorage.setItem('language', language);
+      } catch (error) {
+        console.error('Failed to save settings', error);
+      }
+    };
+
+    saveSettings();
+  }, [fontSize, notifications, language]);
 
   const handleAboutPress = () => {
     Alert.alert("About", "App Version: 1.0.0\nDeveloper: Opendot Solutions");
@@ -65,11 +100,11 @@ const Settings = () => {
                 styles.picker,
                 {
                   color: darkMode ? '#000' : '#000',
-                  backgroundColor: darkMode ? '#fff' : '#fff', // Ensure better contrast in dark mode
+                  backgroundColor: darkMode ? '#fff' : '#fff',
                 },
               ]}
               onValueChange={(itemValue: string) => setLanguage(itemValue)}
-              mode={Platform.OS === 'ios' ? 'dropdown' : 'dialog'} // Set picker mode based on platform
+              mode={Platform.OS === 'ios' ? 'dropdown' : 'dialog'}
             >
               <Picker.Item label="English" value="en" />
               <Picker.Item label="Spanish" value="es" />
@@ -79,7 +114,6 @@ const Settings = () => {
           </View>
         </View>
 
-        {/* Adjust buttons for better visibility on iOS */}
         <View style={styles.buttonContainer}>
           <Button title="About" onPress={handleAboutPress} color={Platform.OS === 'ios' ? '#007AFF' : '#000'} />
         </View>
@@ -120,7 +154,7 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20, // Ensure consistent margin with other settings
+    marginBottom: 20,
   },
   pickerWrapper: {
     flex: 1,
@@ -129,7 +163,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   picker: {
-    width: '100%', // Use full width for the Picker to avoid overflow
+    width: '100%',
   },
   buttonContainer: {
     marginVertical: 10,
